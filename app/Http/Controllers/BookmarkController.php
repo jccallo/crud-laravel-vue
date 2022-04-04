@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Bookmark;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 class BookmarkController extends Controller
 {
@@ -14,8 +16,12 @@ class BookmarkController extends Controller
      */
     public function index()
     {
-        $bookmark = Bookmark::all(['id', 'title', 'url']);
-        return response()->json($bookmark);
+        // $bookmark = Bookmark::all(['id', 'title', 'url']);
+
+        // return response()->json($bookmark);
+
+        $bookmarks_result = DB::select('call show_bookmarks()');
+        return response()->json($bookmarks_result);
     }
 
     /**
@@ -36,7 +42,12 @@ class BookmarkController extends Controller
      */
     public function store(Request $request)
     {
-        $bookmark = Bookmark::create($request->post());
+        // $bookmark = Bookmark::create($request->post());
+        // return response()->json([
+        //     'bookmark' => $bookmark
+        // ]);
+
+        $bookmark = DB::insert('call insert_bookmark(?, ?, ?, ?)', [$request->title, $request->url, Date::now(), Date::now()]);
         return response()->json([
             'bookmark' => $bookmark
         ]);
@@ -50,7 +61,10 @@ class BookmarkController extends Controller
      */
     public function show(Bookmark $bookmark)
     {
-        return response()->json($bookmark);
+        // return response()->json($bookmark);
+
+        $bookmark = DB::select('call show_bookmark(?)', [$bookmark->id]);
+        return response()->json($bookmark[0]);
     }
 
     /**
@@ -77,6 +91,11 @@ class BookmarkController extends Controller
         return response()->json([
             'bookmark' => $bookmark
         ]);
+
+        // $bookmark = DB::update('call update_bookmark(?, ?, ?, ?)', [$request->title, $request->url, Date::now(), $bookmark->id]);
+        // return response()->json([
+        //     'bookmark' => $bookmark
+        // ]);
     }
 
     /**
@@ -91,5 +110,10 @@ class BookmarkController extends Controller
         return response()->json([
             'message'=>'¡Registro eliminado correctamente!'
         ]);
+
+        // $deleted = DB::delete('call delete_bookmark(?)', [$bookmark->id]);
+        // return response()->json([
+        //     'message'=>'¡Registro eliminado correctamente!'
+        // ]);
     }
 }
